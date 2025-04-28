@@ -28,7 +28,9 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     Future.delayed(Duration(seconds: 2), () {
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => HomePage()));
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
+      );
     });
   }
 
@@ -64,7 +66,7 @@ class _HomePageState extends State<HomePage> {
 
     if (playerScore == null || bankerScore == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('숫자를 정확히 입력하세요.')),
+        SnackBar(content: Text('숫자를 정확히 입력해주세요.')),
       );
       return;
     }
@@ -91,17 +93,16 @@ class _HomePageState extends State<HomePage> {
     if (history.length < 10) {
       return '데이터 부족 (랜덤 예측)';
     }
-
     List<String> recent = history.sublist(history.length - 10);
     int playerWins = recent.where((w) => w == 'Player').length;
     int bankerWins = recent.where((w) => w == 'Banker').length;
 
     if (playerWins > bankerWins) {
-      return '다음 예측: Player';
+      return 'Player';
     } else if (bankerWins > playerWins) {
-      return '다음 예측: Banker';
+      return 'Banker';
     } else {
-      return '다음 예측: 랜덤';
+      return ['Player', 'Banker'][DateTime.now().millisecondsSinceEpoch % 2];
     }
   }
 
@@ -109,43 +110,31 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('바카라 게임 예측기'),
+        title: Text('바카라 예측 앱'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextField(
               controller: playerController,
               keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Player 점수',
-                border: OutlineInputBorder(),
-              ),
+              decoration: InputDecoration(labelText: 'Player 점수 입력'),
             ),
-            SizedBox(height: 16),
             TextField(
               controller: bankerController,
               keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Banker 점수',
-                border: OutlineInputBorder(),
-              ),
+              decoration: InputDecoration(labelText: 'Banker 점수 입력'),
             ),
-            SizedBox(height: 16),
+            SizedBox(height: 20),
             ElevatedButton(
               onPressed: submitGame,
               child: Text('결과 입력'),
             ),
-            SizedBox(height: 24),
-            if (lastWinner.isNotEmpty)
-              Text('이번 게임 승자: $lastWinner',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            SizedBox(height: 12),
-            if (prediction.isNotEmpty)
-              Text(prediction,
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            SizedBox(height: 20),
+            Text('최근 승자: $lastWinner'),
+            SizedBox(height: 10),
+            Text('다음 예측: $prediction'),
           ],
         ),
       ),
